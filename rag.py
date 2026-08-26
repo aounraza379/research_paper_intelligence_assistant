@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import os
-import pickle
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any
 
 import faiss
@@ -91,18 +89,6 @@ def build_paper_index(
     if not chunks:
         raise ValueError("No selectable text was found in this PDF.")
     return PaperIndex(Path(filename).stem, chunks, build_index(chunks, model))
-
-
-def load_bundled_index(
-    index_path: str = "spatial_trust.index", chunks_path: str = "chunks.pkl"
-) -> PaperIndex:
-    with open(chunks_path, "rb") as chunks_file:
-        raw_chunks = pickle.load(chunks_file)
-    chunks = [
-        item if isinstance(item, dict) else {"text": item, "page": None}
-        for item in raw_chunks
-    ]
-    return PaperIndex("Spatial-Trust", chunks, faiss.read_index(index_path))
 
 
 def retrieve(

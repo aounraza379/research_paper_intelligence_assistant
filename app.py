@@ -1,5 +1,4 @@
 from html import escape
-from pathlib import Path
 
 import streamlit as st
 
@@ -7,13 +6,12 @@ from rag import (
     PaperIndex,
     build_paper_index,
     generate_answer,
-    load_bundled_index,
     load_embedding_model,
 )
 
 
 st.set_page_config(
-    page_title="PaperLens | Research Paper Intelligence",
+    page_title="Research Paper Intelligence Assistant",
     page_icon="P",
     layout="wide",
     initial_sidebar_state="expanded",
@@ -56,12 +54,7 @@ def get_model():
 
 
 def initialize_state() -> None:
-    if "paper" not in st.session_state:
-        bundled = Path("spatial_trust.index")
-        chunks = Path("chunks.pkl")
-        st.session_state.paper = (
-            load_bundled_index() if bundled.exists() and chunks.exists() else None
-        )
+    st.session_state.setdefault("paper", None)
     st.session_state.setdefault("messages", [])
     st.session_state.setdefault("pending_upload", None)
 
@@ -86,8 +79,8 @@ def main() -> None:
     model = get_model()
 
     with st.sidebar:
-        st.markdown('<div class="brand">PAPERLENS</div>', unsafe_allow_html=True)
-        st.markdown("### Your paper")
+        st.markdown('<div class="brand">RESEARCH PAPER<br>INTELLIGENCE ASSISTANT</div>', unsafe_allow_html=True)
+        st.markdown("### 1. Add your paper")
         uploaded_file = st.file_uploader("Upload a PDF", type=["pdf"])
         if uploaded_file and st.button("Process paper", type="primary", use_container_width=True):
             with st.spinner("Extracting, chunking, and indexing..."):
@@ -102,11 +95,15 @@ def main() -> None:
 
         if st.session_state.paper:
             st.markdown("---")
-            st.markdown(f"**Active document**  \n{st.session_state.paper.title}")
+            st.markdown(f"**Paper ready**  \n{st.session_state.paper.title}")
             st.caption(f"{len(st.session_state.paper.chunks)} searchable passages")
         else:
-            st.info("Upload a text-based PDF to begin.")
+            st.info("Upload a text-based PDF, then click Process paper.")
         st.markdown("---")
+        st.markdown("### How to use")
+        st.markdown(
+            "1. Upload a research paper PDF.\n2. Click **Process paper**.\n3. Ask a question below.\n4. Open the evidence to verify the answer."
+        )
         st.markdown("**Grounding policy**")
         st.markdown(
             '<div class="small-note">Answers are generated only from retrieved passages. Unsupported questions are surfaced instead of guessed.</div>',
@@ -114,17 +111,17 @@ def main() -> None:
         )
 
     st.markdown(
-        '<div class="hero"><div class="eyebrow">Evidence-first literature review</div><h1>Ask a paper.<br>See the proof.</h1><p>PaperLens turns dense research PDFs into a traceable conversation. Every answer is grounded in passages you can inspect.</p></div>',
+        '<div class="hero"><div class="eyebrow">Evidence-first literature review</div><h1>Ask your paper.<br>See the evidence.</h1><p>Turn a dense research PDF into a focused conversation. Every answer is grounded in passages you can inspect.</p></div>',
         unsafe_allow_html=True,
     )
 
     if not st.session_state.paper:
-        st.warning("Upload a PDF in the sidebar to activate the research workspace.")
+        st.warning("Upload a PDF in the sidebar to activate your research workspace.")
         return
 
     paper: PaperIndex = st.session_state.paper
     st.markdown(
-        f'<div class="status"><strong>Ready to research:</strong> {paper.title}</div>',
+        f'<div class="status"><strong>Paper ready:</strong> {paper.title}</div>',
         unsafe_allow_html=True,
     )
     metric_one, metric_two, metric_three = st.columns(3)
@@ -132,7 +129,7 @@ def main() -> None:
     metric_two.metric("Embedding model", "MiniLM")
     metric_three.metric("Answer mode", "Grounded")
 
-    st.markdown("### Conversation")
+    st.markdown("### 2. Ask questions about your paper")
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"])

@@ -1,11 +1,11 @@
 # Research Paper Intelligence Assistant
 
-A RAG (Retrieval-Augmented Generation) system that answers questions about research papers
+A professional, evidence-grounded research workspace that answers questions about research papers
 with verifiable source citations - built component-by-component from scratch (no LangChain)
 to understand *why* each piece exists, not just *how* to call it.
 
-**Test document:** *Spatial-Trust: A Multi-Factor Reputation Framework for Mitigating
-Sybil-Attack Misinformation in Peer-to-Peer Disaster Response Systems*
+The app is document-agnostic: users upload the paper they want to study. No sample paper is
+required, and uploaded documents are indexed in memory for the current session.
 
 ---
 
@@ -56,7 +56,7 @@ flowchart TD
 
 ---
 
-## Example
+## Example workflow
 
 **Q: How does the system detect GPS-spoofing attackers?**
 > The context does not contain enough information to answer how the system detects
@@ -66,8 +66,8 @@ flowchart TD
 >
 > Sources: [Chunk 1]
 
-The system correctly surfaced a nuanced finding *from the paper itself* (that detection
-fails against this attack) rather than assuming "the paper discusses X" means "X works."
+The assistant surfaces a nuanced finding from the paper itself rather than assuming that
+mentioning a topic means the paper proves a solution works.
 
 ---
 
@@ -113,8 +113,7 @@ hidden, per the project's engineering philosophy.
 - `rag.py` — reusable PDF, embedding, retrieval, and Groq generation pipeline
 - `requirements.txt` — dependencies used by Streamlit Cloud
 - `research_paper_intelligence_assistant.ipynb` — full pipeline, step-by-step with explanations
-- `spatial_trust.index` — saved FAISS index (avoids re-embedding on reload)
-- `chunks.pkl` — saved text chunks matching the index
+- `spatial_trust.index` and `chunks.pkl` — legacy prototype artifacts retained for reference
 
 ## Run locally
 
@@ -134,8 +133,8 @@ $env:GROQ_API_KEY = "your-key"
 streamlit run app.py
 ```
 
-The app opens with the bundled Spatial-Trust demo. Users can upload a text-based PDF
-from the sidebar to build a new in-memory index. Uploaded papers are not persisted.
+The app starts empty so users always know which paper they are analyzing. Upload a text-based
+PDF, click **Process paper**, and then ask questions. Uploaded papers are not persisted.
 
 ## Deploy to Streamlit Community Cloud
 
