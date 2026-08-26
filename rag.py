@@ -14,6 +14,13 @@ from sentence_transformers import SentenceTransformer
 
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
 DEFAULT_LLM_MODEL_NAME = "llama-3.1-8b-instant"
+MODEL_FALLBACKS = (
+    "llama-3.1-8b-instant",
+    "llama-3.3-70b-versatile",
+    "openai/gpt-oss-20b",
+    "meta-llama/llama-4-scout-17b-16e-instruct",
+    "qwen/qwen3-32b",
+)
 
 
 @dataclass
@@ -49,6 +56,24 @@ def get_llm_model() -> str:
     except Exception:
         secret = ""
     return secret or os.getenv("GROQ_MODEL", DEFAULT_LLM_MODEL_NAME)
+
+
+def resolve_llm_model(client: Groq) -> str:
+    requested_model = get_llm_model()
+    try:
+        available_models = {model.id for model in client.models.list().data}
+    except Exception:
+        return requested_model
+
+    if requested_model in available_models:
+        return requested_model
+    for fallback_model in MODEL_FALLBACKS:
+        if fallback_model in available_models:
+            return fallback_model
+    raise RuntimeError(
+        "No supported Groq chat model is available for this API key. "
+        "Check the Groq account and API key permissions."
+    )
 
 
 def load_embedding_model() -> SentenceTransformer:
@@ -147,7 +172,7 @@ Question: {query}
 Answer:"""
     client = Groq(api_key=api_key)
     response = client.chat.completions.create(
-        model=get_llm_model(),
+        model=resolve_llm_model(client),
         messages=[{"role": "user", "content": prompt}],
         temperature=0.1,
     )

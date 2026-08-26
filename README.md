@@ -112,8 +112,6 @@ hidden, per the project's engineering philosophy.
 - `app.py` — Streamlit user interface and research workspace
 - `rag.py` — reusable PDF, embedding, retrieval, and Groq generation pipeline
 - `requirements.txt` — dependencies used by Streamlit Cloud
-- `research_paper_intelligence_assistant.ipynb` — full pipeline, step-by-step with explanations
-- `spatial_trust.index` and `chunks.pkl` — legacy prototype artifacts retained for reference
 
 ## Run locally
 
@@ -138,17 +136,19 @@ PDF, click **Process paper**, and then ask questions. Uploaded papers are not pe
 
 ## Deploy to Streamlit Community Cloud
 
-1. Push this repository to GitHub with `app.py`, `rag.py`, `requirements.txt`, `chunks.pkl`, and `spatial_trust.index`.
+1. Push this repository to GitHub with `app.py`, `rag.py`, `requirements.txt`, and `runtime.txt`.
 2. On [share.streamlit.io](https://share.streamlit.io/), choose the repository, branch, and `app.py` as the main file.
 3. Open the app settings and add this secret:
 
 ```toml
 GROQ_API_KEY = "your-key"
-# Optional: override the default supported Groq model
+# Optional: override automatic model discovery
 # GROQ_MODEL = "llama-3.1-8b-instant"
 ```
 
 4. Deploy and share the generated app URL.
 
 The first startup downloads the `all-MiniLM-L6-v2` embedding model, so the initial load
-can take longer than later visits. Never commit the API key or `.streamlit/secrets.toml`.
+can take longer than later visits. The app checks Groq's available model catalog and falls
+back to a supported model if an old `GROQ_MODEL` value is configured. Never commit the API
+key or `.streamlit/secrets.toml`.

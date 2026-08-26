@@ -62,7 +62,7 @@ def initialize_state() -> None:
 def render_sources(sources) -> None:
     st.markdown("#### Evidence retrieved from the paper")
     for source in sources:
-        page_label = f"Page {source.page}" if source.page else "Bundled demo source"
+        page_label = f"Page {source.page}" if source.page else "Page unavailable"
         st.markdown(
             f"""
 <div class="source">
@@ -159,8 +159,9 @@ def main() -> None:
                     error_name = type(error).__name__
                     if error_name == "NotFoundError":
                         st.error(
-                            "The configured Groq model is unavailable. Set GROQ_MODEL to "
-                            "llama-3.1-8b-instant in Streamlit Cloud Secrets, then reboot the app."
+                            "Groq did not provide an available chat model for this API key. "
+                            "Remove the GROQ_MODEL secret from Streamlit Cloud, or set it to "
+                            "a model currently listed in your Groq account, then reboot the app."
                         )
                     else:
                         st.error(
