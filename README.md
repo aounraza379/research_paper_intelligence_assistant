@@ -109,6 +109,45 @@ hidden, per the project's engineering philosophy.
 
 ## Files
 
+- `app.py` — Streamlit user interface and research workspace
+- `rag.py` — reusable PDF, embedding, retrieval, and Groq generation pipeline
+- `requirements.txt` — dependencies used by Streamlit Cloud
 - `research_paper_intelligence_assistant.ipynb` — full pipeline, step-by-step with explanations
 - `spatial_trust.index` — saved FAISS index (avoids re-embedding on reload)
 - `chunks.pkl` — saved text chunks matching the index
+
+## Run locally
+
+Create a virtual environment, install the dependencies, and provide a Groq API key:
+
+```bash
+py -3.10 -m venv .venv310
+.venv310\\Scripts\\activate
+pip install -r requirements.txt
+streamlit run app.py
+```
+
+PowerShell users can set the key for the current session with:
+
+```powershell
+$env:GROQ_API_KEY = "your-key"
+streamlit run app.py
+```
+
+The app opens with the bundled Spatial-Trust demo. Users can upload a text-based PDF
+from the sidebar to build a new in-memory index. Uploaded papers are not persisted.
+
+## Deploy to Streamlit Community Cloud
+
+1. Push this repository to GitHub with `app.py`, `rag.py`, `requirements.txt`, `chunks.pkl`, and `spatial_trust.index`.
+2. On [share.streamlit.io](https://share.streamlit.io/), choose the repository, branch, and `app.py` as the main file.
+3. Open the app settings and add this secret:
+
+```toml
+GROQ_API_KEY = "your-key"
+```
+
+4. Deploy and share the generated app URL.
+
+The first startup downloads the `all-MiniLM-L6-v2` embedding model, so the initial load
+can take longer than later visits. Never commit the API key or `.streamlit/secrets.toml`.
