@@ -13,7 +13,7 @@ from sentence_transformers import SentenceTransformer
 
 
 EMBEDDING_MODEL_NAME = "all-MiniLM-L6-v2"
-LLM_MODEL_NAME = "llama-3.3-70b-versatile"
+DEFAULT_LLM_MODEL_NAME = "llama-3.1-8b-instant"
 
 
 @dataclass
@@ -39,6 +39,16 @@ def get_api_key() -> str:
     except Exception:
         secret = ""
     return secret or os.getenv("GROQ_API_KEY", "")
+
+
+def get_llm_model() -> str:
+    try:
+        import streamlit as st
+
+        secret = st.secrets.get("GROQ_MODEL", "")
+    except Exception:
+        secret = ""
+    return secret or os.getenv("GROQ_MODEL", DEFAULT_LLM_MODEL_NAME)
 
 
 def load_embedding_model() -> SentenceTransformer:
@@ -137,7 +147,7 @@ Question: {query}
 Answer:"""
     client = Groq(api_key=api_key)
     response = client.chat.completions.create(
-        model=LLM_MODEL_NAME,
+        model=get_llm_model(),
         messages=[{"role": "user", "content": prompt}],
         temperature=0.1,
     )

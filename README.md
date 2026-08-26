@@ -52,7 +52,7 @@ flowchart TD
 | Chunking | Custom Python (character-based, overlapping) |
 | Embeddings | Sentence-Transformers (`all-MiniLM-L6-v2`) |
 | Vector search | FAISS (`IndexFlatL2`) |
-| LLM generation | Groq API (Llama 3.3 70B) |
+| LLM generation | Groq API (`llama-3.1-8b-instant` by default) |
 
 ---
 
@@ -144,6 +144,8 @@ PDF, click **Process paper**, and then ask questions. Uploaded papers are not pe
 
 ```toml
 GROQ_API_KEY = "your-key"
+# Optional: override the default supported Groq model
+# GROQ_MODEL = "llama-3.1-8b-instant"
 ```
 
 4. Deploy and share the generated app URL.

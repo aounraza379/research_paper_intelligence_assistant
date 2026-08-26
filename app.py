@@ -155,6 +155,18 @@ def main() -> None:
                 except RuntimeError as error:
                     st.error(str(error))
                     st.info("Add GROQ_API_KEY under Streamlit Cloud App settings > Secrets.")
+                except Exception as error:
+                    error_name = type(error).__name__
+                    if error_name == "NotFoundError":
+                        st.error(
+                            "The configured Groq model is unavailable. Set GROQ_MODEL to "
+                            "llama-3.1-8b-instant in Streamlit Cloud Secrets, then reboot the app."
+                        )
+                    else:
+                        st.error(
+                            "Groq could not generate an answer right now. Check the API key, "
+                            "model setting, and app logs, then try again."
+                        )
 
 
 if __name__ == "__main__":
